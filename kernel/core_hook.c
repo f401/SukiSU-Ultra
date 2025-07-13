@@ -127,6 +127,14 @@ static inline void susfs_on_post_fs_data(void) {
 }
 #endif // #ifdef CONFIG_KSU_SUSFS
 
+#ifndef CMD_SUSFS_UMOUNT_FOR_ZYGOTE_ISO_SERVICE
+#define CMD_SUSFS_UMOUNT_FOR_ZYGOTE_ISO_SERVICE 0x55562
+#endif
+
+#ifdef CMD_SUSFS_HIDE_SUS_MNTS_FOR_ALL_PROCS
+#define CMD_SUSFS_HIDE_SUS_MNTS_FOR_ALL_PROCS 0x55561
+#endif 
+
 static bool ksu_module_mounted = false;
 
 extern int ksu_handle_sepolicy(unsigned long arg3, void __user *arg4);
@@ -669,6 +677,7 @@ int ksu_handle_prctl(int option, unsigned long arg2, unsigned long arg3,
 				pr_info("susfs: copy_to_user() failed\n");
 			return 0;
 		}
+#ifdef CMD_SUSFS_SET_ANDROID_DATA_ROOT_PATH
 		if (arg2 == CMD_SUSFS_SET_ANDROID_DATA_ROOT_PATH) {
 			int error = 0;
 			if (!ksu_access_ok((void __user*)arg3, SUSFS_MAX_LEN_PATHNAME)) {
@@ -685,6 +694,8 @@ int ksu_handle_prctl(int option, unsigned long arg2, unsigned long arg3,
 				pr_info("susfs: copy_to_user() failed\n");
 			return 0;
 		}
+#endif
+#ifdef CMD_SUSFS_SET_SDCARD_ROOT_PATH
 		if (arg2 == CMD_SUSFS_SET_SDCARD_ROOT_PATH) {
 			int error = 0;
 			if (!ksu_access_ok((void __user*)arg3, SUSFS_MAX_LEN_PATHNAME)) {
@@ -701,6 +712,7 @@ int ksu_handle_prctl(int option, unsigned long arg2, unsigned long arg3,
 				pr_info("susfs: copy_to_user() failed\n");
 			return 0;
 		}
+#endif
 #endif //#ifdef CONFIG_KSU_SUSFS_SUS_PATH
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 		if (arg2 == CMD_SUSFS_ADD_SUS_MOUNT) {
@@ -719,6 +731,7 @@ int ksu_handle_prctl(int option, unsigned long arg2, unsigned long arg3,
 				pr_info("susfs: copy_to_user() failed\n");
 			return 0;
 		}
+
 		if (arg2 == CMD_SUSFS_HIDE_SUS_MNTS_FOR_ALL_PROCS) {
 			int error = 0;
 			if (arg3 != 0 && arg3 != 1) {
